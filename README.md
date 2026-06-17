@@ -100,7 +100,6 @@ Bump the `version:` field in `pubspec.yaml` (e.g. `1.1.0+2`) and push to `main`.
 - [ ] Add weather icons matching the current condition (sun, rain, snow, etc.)
 - [ ] Add hourly / daily forecast
 - [ ] Settings screen for persisting preferences
-- [ ] Add Android app signing for Play Store distribution
 - [ ] Add iOS build to CI
 - [ ] Add localization support (en/de already in settings service)
 
