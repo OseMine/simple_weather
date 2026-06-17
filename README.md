@@ -9,7 +9,7 @@ A Flutter weather app that uses GPS location and OpenWeatherMap to display the c
 - Animated temperature display: count-up, slide-up, blur, and fade-in
 - Weather-condition background icon watermark
 - Metric/imperial unit support
-- Onboarding screen (placeholder)
+- Onboarding screen (theme, accent color, units, language)
 
 ## Tech Stack
 
@@ -51,7 +51,7 @@ lib/
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/YOUR_USERNAME/simple_weather.git
+   git clone https://github.com/OseMine/simple_weather.git
    cd simple_weather
    ```
 
@@ -75,7 +75,14 @@ lib/
 
 ## CI/CD
 
-A GitHub Actions workflow (`.github/workflows/build.yml`) automatically builds on push/PR to `main`. To use it:
+A GitHub Actions workflow (`.github/workflows/build.yml`) automatically builds on push/PR to `main`. It:
+
+- Runs `flutter analyze` and `flutter test`
+- Builds the web release
+- Builds the Android APK release
+- On push to `main`: detects version bumps in `pubspec.yaml` and creates a **GitHub Release** with the APK + web build using `RELEASE.md` as the body
+
+### Setup
 
 1. Go to **Settings → Secrets and variables → Actions** in your repo.
 2. Add a repository secret named `OPENWEATHER_API_KEY` with your API key.
@@ -83,6 +90,19 @@ A GitHub Actions workflow (`.github/workflows/build.yml`) automatically builds o
    ```sh
    echo "const String apiKey = '${{ secrets.OPENWEATHER_API_KEY }}';" > lib/services/api_key.dart
    ```
+
+### Triggering a Release
+
+Bump the `version:` field in `pubspec.yaml` (e.g. `1.1.0+2`) and push to `main`. The workflow will detect the new version and create a release automatically.
+
+## TODOs
+
+- [ ] Add weather icons matching the current condition (sun, rain, snow, etc.)
+- [ ] Add hourly / daily forecast
+- [ ] Settings screen for persisting preferences
+- [ ] Add Android app signing for Play Store distribution
+- [ ] Add iOS build to CI
+- [ ] Add localization support (en/de already in settings service)
 
 ## Contributing
 

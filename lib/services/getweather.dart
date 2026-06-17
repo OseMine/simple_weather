@@ -4,7 +4,6 @@ import 'package:geolocator/geolocator.dart';
 import 'settings.dart' as settings;
 import 'api_key.dart';
 
-var units = settings.units;
 class Weather {
   final String main;
   final String description;
@@ -41,7 +40,7 @@ Future<Weather> getWeather() async {
 
   final response = await http.get(
     Uri.parse(
-      'https://api.openweathermap.org/data/2.5/weather?lat=${position.latitude}&lon=${position.longitude}&units=${units}&appid=$apiKey',
+      'https://api.openweathermap.org/data/2.5/weather?lat=${position.latitude}&lon=${position.longitude}&units=${settings.SettingsService().units}&appid=$apiKey',
     ),
   );
 

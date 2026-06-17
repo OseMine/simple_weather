@@ -13,7 +13,7 @@ class TemperatureDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TweenAnimationBuilder<double>(
-      tween: Tween(begin: settings.lastTemperature, end: temperature),
+      tween: Tween(begin: settings.SettingsService().lastTemperature, end: temperature),
       duration: 2000.ms,
       curve: Curves.easeOutCubic,
       builder: (context, value, child) {
