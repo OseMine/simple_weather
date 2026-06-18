@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../services/getweather.dart';
 import '../widgets/weather_background.dart';
 import '../widgets/temperature_display.dart';
+import '../services/settings.dart' as settings;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -32,6 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
           }
 
           final weatherData = snapshot.data!;
+          settings.SettingsService().updateLastTemperature(weatherData.temperature);
 
           return WeatherBackground(
             weather: weatherData,

@@ -46,3 +46,4 @@ app.*.map.json
 
 # API key (gitignored to keep secret)
 lib/services/api_key.dart
+.vercel

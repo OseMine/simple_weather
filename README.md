@@ -75,25 +75,30 @@ lib/
 
 ## CI/CD
 
-A GitHub Actions workflow (`.github/workflows/build.yml`) automatically builds on push/PR to `main`. It:
+Three GitHub Actions workflows run on push/PR to `main`:
 
-- Runs `flutter analyze` and `flutter test`
-- Builds the web release
-- Builds the Android APK release
-- On push to `main`: detects version bumps in `pubspec.yaml` and creates a **GitHub Release** with the APK + web build using `RELEASE.md` as the body
+| Workflow | File | What it does |
+|---|---|---|
+| **Build APK** | `build-apk.yml` | analyze → test → build Android APK |
+| **Build Web** | `build-web.yml` | analyze → test → build web → **deploy to Vercel** (main only) |
+| **Release** | `release.yml` | on version bump: build APK + web → create GitHub Release |
 
-### Setup
+### Setup Secrets
 
-1. Go to **Settings → Secrets and variables → Actions** in your repo.
-2. Add a repository secret named `OPENWEATHER_API_KEY` with your API key.
-3. The workflow injects the key at build time via:
-   ```sh
-   echo "const String apiKey = '${{ secrets.OPENWEATHER_API_KEY }}';" > lib/services/api_key.dart
-   ```
+Go to **Settings → Secrets and variables → Actions** in your repo and add:
+
+| Secret | Description |
+|---|---|
+| `OPENWEATHER_API_KEY` | Your OpenWeatherMap API key |
+| `VERCEL_TOKEN` | Vercel API token (from Account → Settings → Tokens) |
+| `VERCEL_ORG_ID` | Your Vercel team/username ID |
+| `VERCEL_PROJECT_ID` | Your Vercel project ID |
+
+Run `npx vercel link` locally to generate `.vercel/project.json` containing the org and project IDs.
 
 ### Triggering a Release
 
-Bump the `version:` field in `pubspec.yaml` (e.g. `1.1.0+2`) and push to `main`. The workflow will detect the new version and create a release automatically.
+Bump the `version:` field in `pubspec.yaml` (e.g. `1.1.0+2`) and push to `main`. The release workflow detects the new version and creates a tagged release with APK + web ZIP.
 
 ## TODOs
 

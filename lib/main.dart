@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'services/settings.dart';
 import 'screens/home_screen.dart';
 import 'screens/onboarding.dart';
+
 void main() {
   // 1. Wir erstellen eine Instanz deines Services beim App-Start
   final settingsService = SettingsService();
-
+  settingsService.initSettings();
   runApp(WeatherApp(settingsService: settingsService));
 }
 
@@ -47,7 +48,7 @@ class WeatherApp extends StatelessWidget {
             useMaterial3: true,
           ),
 
-          // 4. Die Weiche: Ist das Onboarding fertig? 
+          // 4. Die Weiche: Ist das Onboarding fertig?
           // Wenn ja -> HomeScreen, wenn nein -> OnboardingScreen
           home: settingsService.onboardingDone
               ? const HomeScreen()
@@ -56,4 +57,6 @@ class WeatherApp extends StatelessWidget {
       },
     );
   }
-}
+    
+  }
+

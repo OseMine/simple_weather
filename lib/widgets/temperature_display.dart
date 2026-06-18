@@ -44,4 +44,5 @@ class TemperatureDisplay extends StatelessWidget {
           curve: Curves.easeOutCubic,
         );
   }
+
 }

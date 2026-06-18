@@ -1,13 +1,17 @@
 {
-    "name": "simple_weather",
-    "short_name": "simple_weather",
-    "start_url": ".",
+    "name": "Simple Weather",
+    "short_name": "Weather",
+    "start_url": "/",
     "display": "standalone",
     "background_color": "#0175C2",
     "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "description": "A simple and clean weather forecast application.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
+    "categories": [
+        "weather",
+        "utilities"
+    ],
     "icons": [
         {
             "src": "icons/Icon-192.png",
@@ -30,6 +34,22 @@
             "sizes": "512x512",
             "type": "image/png",
             "purpose": "maskable"
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "screenshots/mobile.png",
+            "sizes": "1080x1920",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "Weather forecast on mobile"
+        },
+        {
+            "src": "screenshots/desktop.png",
+            "sizes": "1920x1080",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "Weather forecast on desktop"
         }
     ]
 }
