@@ -18,7 +18,7 @@ class SettingsService extends ChangeNotifier {
     themeMode = (prefs?.getBool('isDarkMode') ?? false)
         ? ThemeMode.dark
         : ThemeMode.light;
-    accentColor = Color(prefs?.getInt('accentColor') ?? Colors.green.value);
+    accentColor = Color(prefs?.getInt('accentColor') ?? Colors.green.toARGB32());
     bgblur = prefs?.getDouble('bgblur') ?? 10.0;
     units = prefs?.getString('units') ?? 'metric';
     lastTemperature = prefs?.getDouble('lastTemperature') ?? 161.0;
@@ -46,7 +46,7 @@ class SettingsService extends ChangeNotifier {
 
   void updateAccentColor(Color color) {
     accentColor = color;
-    prefs?.setInt('accentColor', color.value);
+    prefs?.setInt('accentColor', color.toARGB32());
     notifyListeners();
   }
 
