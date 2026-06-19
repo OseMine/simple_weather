@@ -63,6 +63,14 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+flutter_launcher_icons:
+  android: "launcher_icon"
+  image_path: "assets/icons/app_icon_legacy.png"
+  # Adaptive Icons für moderne Android-Systeme
+  adaptive_icon_background: "#FFFFFF" # Oder Pfad zu einer Grafik: "assets/icons/bg.png"
+  adaptive_icon_foreground: "assets/icons/fg.svg"
+  # DAS WICHTIGSTE FÜR MULTICOLOUR/TINT:
+  adaptive_icon_monochrome: "assets/icons/fg.svg"
 
   # To add assets to your application, add an assets section, like this:
   # assets:

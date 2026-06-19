@@ -7,7 +7,7 @@ import 'package:system_theme/system_theme.dart';
 SharedPreferences? prefs;
 
 class SettingsService extends ChangeNotifier {
-  Color systemcolor = SystemTheme.accentColor.accent;
+  Color systemAccentColor = SystemTheme.kDefaultFallbackColor;
   ThemeMode systemthemeMode = ThemeMode.light;
   double lastTemperature = 0.0;
   String lastDescription = '';
@@ -31,11 +31,22 @@ class SettingsService extends ChangeNotifier {
           ? ThemeMode.dark
           : ThemeMode.light;
     }
-    accentColor = Color(prefs?.getInt('accentColor') ?? systemcolor.toARGB32());
+    accentColor = Color(prefs?.getInt('accentColor') ?? await _loadSystemAccentColor());
     bgblur = prefs?.getDouble('bgblur') ?? 10.0;
     units = prefs?.getString('units') ?? 'metric';
     lastTemperature = prefs?.getDouble('lastTemperature') ?? 161.0;
     notifyListeners();
+  }
+
+  Future<int> _loadSystemAccentColor() async {
+    try {
+      await SystemTheme.accentColor.load();
+      systemAccentColor = SystemTheme.accentColor.accent;
+      return systemAccentColor.toARGB32();
+    } catch (_) {
+      systemAccentColor = SystemTheme.kDefaultFallbackColor;
+      return systemAccentColor.toARGB32();
+    }
   }
 
   // Funktionen, um die Werte zu ändern und die UI zu aktualisieren

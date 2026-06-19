@@ -222,7 +222,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildAccentColorPage(ThemeData theme) {
     final service = widget.settingsService;
-    final List<Color> colors = [Colors.blue, Colors.green, Colors.orange, Colors.purple, Colors.red, Colors.teal, service.systemcolor];
+    final List<Color> colors = [Colors.blue, Colors.green, Colors.orange, Colors.purple, Colors.red, Colors.teal, service.systemAccentColor];
 
     return _buildCard(
       children: [

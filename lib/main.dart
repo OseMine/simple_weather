@@ -5,6 +5,7 @@ import 'screens/home_screen.dart';
 import 'screens/onboarding.dart';
 
 void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   // 1. Wir erstellen eine Instanz deines Services beim App-Start
   final settingsService = SettingsService();
   await settingsService.initSettings();
