@@ -48,5 +48,7 @@ Future<Weather> getWeather() async {
     throw Exception('Failed to load weather: ${response.statusCode}');
   }
 
-  return Weather.fromJson(jsonDecode(response.body));
+  final weather = Weather.fromJson(jsonDecode(response.body));
+
+  return weather;
 }

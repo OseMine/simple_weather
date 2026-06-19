@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'services/settings.dart';
+import 'services/widget_service.dart';
 import 'screens/home_screen.dart';
 import 'screens/onboarding.dart';
 
-void main() {
+void main() async {
   // 1. Wir erstellen eine Instanz deines Services beim App-Start
   final settingsService = SettingsService();
-  settingsService.initSettings();
+  await settingsService.initSettings();
+  await WidgetService.init();
   runApp(WeatherApp(settingsService: settingsService));
 }
 

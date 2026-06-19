@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/getweather.dart';
+import '../services/widget_service.dart';
 import '../widgets/weather_background.dart';
 import '../widgets/temperature_display.dart';
 import '../services/settings.dart' as settings;
@@ -33,7 +34,18 @@ class _HomeScreenState extends State<HomeScreen> {
           }
 
           final weatherData = snapshot.data!;
-          settings.SettingsService().updateLastTemperature(weatherData.temperature);
+          final s = settings.SettingsService();
+          s.updateLastTemperature(weatherData.temperature);
+          s.updateLastDescription(weatherData.description);
+          WidgetService.updateWeatherWidget(
+            temperature: weatherData.temperature,
+            description: weatherData.description,
+            units: s.units,
+            brightness: s.themeMode == ThemeMode.dark
+                ? Brightness.dark
+                : Brightness.light,
+            seedColor: s.accentColor,
+          );
 
           return WeatherBackground(
             weather: weatherData,
