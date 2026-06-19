@@ -46,13 +46,34 @@ jobs:
       - run: flutter build apk --release
         if: steps.check_tag.outputs.exists == 'false'
 
-      - run: flutter build web --release
+      - run: flutter build web --release --no-source-maps
         if: steps.check_tag.outputs.exists == 'false'
+
+      - name: Prepare Vercel output
+        if: steps.check_tag.outputs.exists == 'false'
+        run: |
+          mkdir -p .vercel/output/static
+          cp -r build/web/* .vercel/output/static/
+          cat > .vercel/output/config.json << 'EOF'
+          {
+            "version": 3,
+            "routes": [
+              { "src": "/(.*)", "dest": "/index.html" }
+            ]
+          }
+          EOF
 
       - name: Create release ZIP for web
         if: steps.check_tag.outputs.exists == 'false'
         run: |
           cd build/web && zip -r ../../simple-weather-web.zip . && cd ../..
+
+      - name: Deploy to Vercel
+        if: steps.check_tag.outputs.exists == 'false'
+        run: npx vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
 
       - name: Create Release
         if: steps.check_tag.outputs.exists == 'false'

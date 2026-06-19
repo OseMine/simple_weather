@@ -21,6 +21,8 @@ class WidgetService {
     Brightness brightness = Brightness.light,
     Color? seedColor,
   }) async {
+    if (kIsWeb) return;
+
     String tempStr = units == 'metric'
         ? '${temperature.toInt()}°C'
         : '${temperature.toInt()}°F';

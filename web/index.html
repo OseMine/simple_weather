@@ -18,19 +18,49 @@
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="A new Flutter project.">
+  <meta name="description" content="A simple and clean weather forecast application.">
 
-  <!-- iOS meta tags & icons -->
+  <!-- PWA -->
+  <meta name="theme-color" content="#0175C2">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="simple_weather">
-  <link rel="icon" href="icons/favicon.ico" sizes="any">
-  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-
-  <title>simple_weather</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="icon" href="icons/favicon.ico" sizes="any">
+
+  <!-- iOS -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Simple Weather">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="apple-touch-startup-image" href="icons/apple-touch-icon.png">
+
+  <!-- Windows -->
+  <meta name="msapplication-TileColor" content="#0175C2">
+  <meta name="msapplication-TileImage" content="icons/icon-192.png">
+
+  <title>Simple Weather</title>
 </head>
 <body>
+  <!--
+    Polyfill computedStyleMap for Firefox.
+    The system_theme_web package uses this API which only exists in Chromium.
+  -->
+  <script>
+    if (typeof Element.prototype.computedStyleMap !== 'function') {
+      Element.prototype.computedStyleMap = function() {
+        var style = window.getComputedStyle(this);
+        var map = {
+          get: function(prop) {
+            var value = style.getPropertyValue(prop);
+            return {
+              toString: function() { return value; }
+            };
+          }
+        };
+        return map;
+      };
+    }
+  </script>
+
   <!--
     You can customize the "flutter_bootstrap.js" script.
     This is useful to provide a custom configuration to the Flutter loader
