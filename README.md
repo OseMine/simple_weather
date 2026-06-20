@@ -7,9 +7,7 @@
   <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter">
 </p>
 
-<p align="center">
-  <img src="web/screenshots/desktop.png" width="700" alt="Simple Weather Screenshot">
-</p>
+
 
 A minimalistic Flutter weather app that uses GPS location and OpenWeatherMap to display the current weather with a clean, animated interface.
 
@@ -28,7 +26,6 @@ A minimalistic Flutter weather app that uses GPS location and OpenWeatherMap to 
 ## Screenshots
 
 <p align="center">
-  <img src="web/screenshots/desktop.png" width="400" alt="Desktop">
   <img src="assets/icons/screenshots/Weather%20Page.png" width="200" alt="Weather Page">
   <img src="assets/icons/screenshots/Details%20page.png" width="200" alt="Details Page">
 </p>
