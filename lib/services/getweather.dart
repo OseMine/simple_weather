@@ -37,7 +37,20 @@ Future<Weather> getWeather() async {
       distanceFilter: 100,
     ),
   );
-
+  bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    throw Exception('Location services are disabled.');
+  }
+  LocationPermission permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      throw Exception('Location permissions are denied');
+    }
+  }
+  if (permission == LocationPermission.deniedForever) {
+    throw Exception('Location permissions are permanently denied, we cannot request permissions.');
+  }
   final response = await http.get(
     Uri.parse(
       'https://api.openweathermap.org/data/2.5/weather?lat=${position.latitude}&lon=${position.longitude}&units=${settings.SettingsService().units}&appid=$apiKey',
