@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/getweather.dart';
 import '../services/settings.dart' as settings;
-import '../widgets/weather_background.dart';
 
 class ForecastScreen extends StatefulWidget {
   const ForecastScreen({super.key});
@@ -74,108 +73,105 @@ class _ForecastScreenState extends State<ForecastScreen> {
             weatherDesc = map[weather.description.toLowerCase()] ?? weather.description;
           }
 
-          return WeatherBackground(
-            weather: weather,
-            child: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: cs.primaryContainer.withValues(alpha: 0.6),
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Icon(Icons.list_alt_rounded, color: cs.onPrimaryContainer),
+          return SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 48, 24, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: cs.primaryContainer.withValues(alpha: 0.6),
+                          borderRadius: BorderRadius.circular(14),
                         ),
-                        const SizedBox(width: 14),
-                        Text(
-                          'Wetter Details',
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
+                        child: Icon(Icons.list_alt_rounded, color: cs.onPrimaryContainer),
+                      ),
+                      const SizedBox(width: 14),
+                      Text(
+                        'Wetter Details',
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 32),
+                  Expanded(
+                    child: ListView(
+                      children: [
+                        _DetailTile(
+                          icon: Icons.thermostat_rounded,
+                          label: s.language == 'de' ? 'Temperatur' : 'Temperature',
+                          value: '${weather.temperature.toStringAsFixed(0)}$tempUnit',
+                          cs: cs,
+                        ),
+                        const SizedBox(height: 12),
+                        _DetailTile(
+                          icon: Icons.cloud_rounded,
+                          label: s.language == 'de' ? 'Wetter' : 'Condition',
+                          value: weatherDesc,
+                          cs: cs,
+                        ),
+                        const SizedBox(height: 12),
+                        _DetailTile(
+                          icon: Icons.cloud_queue_rounded,
+                          label: s.language == 'de' ? 'Bewölkung' : 'Cloudiness',
+                          value: s.language == 'de'
+                              ? '${weather.clouds.toStringAsFixed(0)}%'
+                              : '${weather.clouds.toStringAsFixed(0)}%',
+                          cs: cs,
+                        ),
+                        const SizedBox(height: 12),
+                        _DetailTile(
+                          icon: Icons.air_rounded,
+                          label: s.language == 'de' ? 'Wind' : 'Wind',
+                          value: '~ $windUnit',
+                          cs: cs,
+                        ),
+                        const SizedBox(height: 24),
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: cs.surfaceContainerHighest.withValues(alpha: 0.6),
+                            borderRadius: BorderRadius.circular(20),
+                            border: Border.all(
+                              color: cs.outlineVariant.withValues(alpha: 0.25),
+                            ),
+                          ),
+                          child: Column(
+                            children: [
+                              Icon(Icons.auto_awesome_rounded, color: cs.primary, size: 28),
+                              const SizedBox(height: 12),
+                              Text(
+                                s.language == 'de'
+                                    ? 'Erweiterte Vorhersage in Entwicklung'
+                                    : 'Extended forecast in development',
+                                style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                  color: cs.onSurfaceVariant,
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                s.language == 'de'
+                                    ? 'Stündliche und 7-Tage-Vorhersagen folgen bald.'
+                                    : 'Hourly and 7-day forecasts coming soon.',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: cs.onSurfaceVariant.withValues(alpha: 0.7),
+                                ),
+                                textAlign: TextAlign.center,
+                              ),
+                            ],
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 32),
-                    Expanded(
-                      child: ListView(
-                        children: [
-                          _DetailTile(
-                            icon: Icons.thermostat_rounded,
-                            label: s.language == 'de' ? 'Temperatur' : 'Temperature',
-                            value: '${weather.temperature.toStringAsFixed(0)}$tempUnit',
-                            cs: cs,
-                          ),
-                          const SizedBox(height: 12),
-                          _DetailTile(
-                            icon: Icons.cloud_rounded,
-                            label: s.language == 'de' ? 'Wetter' : 'Condition',
-                            value: weatherDesc,
-                            cs: cs,
-                          ),
-                          const SizedBox(height: 12),
-                          _DetailTile(
-                            icon: Icons.cloud_queue_rounded,
-                            label: s.language == 'de' ? 'Bewölkung' : 'Cloudiness',
-                            value: s.language == 'de'
-                                ? '${weather.clouds.toStringAsFixed(0)}%'
-                                : '${weather.clouds.toStringAsFixed(0)}%',
-                            cs: cs,
-                          ),
-                          const SizedBox(height: 12),
-                          _DetailTile(
-                            icon: Icons.air_rounded,
-                            label: s.language == 'de' ? 'Wind' : 'Wind',
-                            value: '~ $windUnit',
-                            cs: cs,
-                          ),
-                          const SizedBox(height: 24),
-                          Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(20),
-                            decoration: BoxDecoration(
-                              color: cs.surfaceContainerHighest.withValues(alpha: 0.6),
-                              borderRadius: BorderRadius.circular(20),
-                              border: Border.all(
-                                color: cs.outlineVariant.withValues(alpha: 0.25),
-                              ),
-                            ),
-                            child: Column(
-                              children: [
-                                Icon(Icons.auto_awesome_rounded, color: cs.primary, size: 28),
-                                const SizedBox(height: 12),
-                                Text(
-                                  s.language == 'de'
-                                      ? 'Erweiterte Vorhersage in Entwicklung'
-                                      : 'Extended forecast in development',
-                                  style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                    color: cs.onSurfaceVariant,
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  s.language == 'de'
-                                      ? 'Stündliche und 7-Tage-Vorhersagen folgen bald.'
-                                      : 'Hourly and 7-day forecasts coming soon.',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                    color: cs.onSurfaceVariant.withValues(alpha: 0.7),
-                                  ),
-                                  textAlign: TextAlign.center,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           );

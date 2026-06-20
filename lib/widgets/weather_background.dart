@@ -20,45 +20,52 @@ class WeatherBackground extends StatelessWidget {
     final iconUrl = 'https://openweathermap.org/img/wn/${weather.icon}@4x.png';
     final blurValue = settings.SettingsService().bgblur;
 
-    final body = Stack(
-      children: [
-        Positioned(
-          bottom: -60,
-          right: -60,
-          child: ImageFiltered(
-            imageFilter: ImageFilter.blur(
-              sigmaX: blurValue,
-              sigmaY: blurValue,
-            ),
-            child: Opacity(
-              opacity: 0.12,
-              child: Image.network(
-                iconUrl,
-                width: 380,
-                height: 380,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) => const SizedBox(),
-              ),
-            ),
+    final background = Positioned(
+      bottom: MediaQuery.of(context).size.height / 2,
+      right: MediaQuery.of(context).size.width / 2,
+      child: ImageFiltered(
+        imageFilter: ImageFilter.blur(
+          sigmaX: blurValue,
+          sigmaY: blurValue,
+        ),
+        child: Opacity(
+          opacity: 0.12,
+          child: Image.network(
+            iconUrl,
+            width: 380,
+            height: 380,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) => const SizedBox(),
           ),
         ),
-        child,
-      ],
+      ),
     );
 
     if (onRefresh != null) {
-      return RefreshIndicator(
-        onRefresh: onRefresh!,
-        child: SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: SizedBox(
-            height: MediaQuery.of(context).size.height,
-            child: body,
+      return Stack(
+        children: [
+          background,
+          Positioned.fill(
+            child: RefreshIndicator(
+              onRefresh: onRefresh!,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height,
+                  child: child,
+                ),
+              ),
+            ),
           ),
-        ),
+        ],
       );
     }
 
-    return body;
+    return Stack(
+      children: [
+        background,
+        child,
+      ],
+    );
   }
 }

@@ -38,10 +38,23 @@ class WeatherApp extends StatelessWidget {
           ),
 
           darkTheme: ThemeData(
-            colorScheme: ColorScheme.fromSeed(
-              seedColor: settingsService.accentColor,
-              brightness: Brightness.dark,
-            ),
+            colorScheme: (settingsService.pitchBlack
+                ? ColorScheme.fromSeed(
+                    seedColor: settingsService.accentColor,
+                    brightness: Brightness.dark,
+                  ).copyWith(
+                    surface: Colors.black,
+                    surfaceContainerHigh: Colors.black,
+                    surfaceContainerHighest: Colors.black,
+                    surfaceContainerLow: Colors.black,
+                    surfaceContainerLowest: Colors.black,
+                    surfaceDim: Colors.black,
+                    surfaceBright: Colors.black,
+                  )
+                : ColorScheme.fromSeed(
+                    seedColor: settingsService.accentColor,
+                    brightness: Brightness.dark,
+                  )),
             useMaterial3: true,
           ),
 

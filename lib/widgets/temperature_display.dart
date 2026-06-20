@@ -18,7 +18,7 @@ class TemperatureDisplay extends StatelessWidget {
       curve: Curves.easeOutCubic,
       builder: (context, value, child) {
         return Text(
-          '${value.toStringAsFixed(0)}°C',
+          '${value.toStringAsFixed(0)}°',
           style: const TextStyle(
             fontSize: 150,
             fontWeight: FontWeight.bold,

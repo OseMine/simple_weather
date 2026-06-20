@@ -14,6 +14,22 @@ class OnboardingScreen extends StatefulWidget {
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
+  bool _locationPermissionGranted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLocationPermission();
+  }
+
+  Future<void> _checkLocationPermission() async {
+    final permission = await Geolocator.checkPermission();
+    if (mounted) {
+      setState(() {
+        _locationPermissionGranted = permission == LocationPermission.whileInUse || permission == LocationPermission.always;
+      });
+    }
+  }
 
   static const _totalSteps = 5;
 
@@ -30,17 +46,17 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: BoxDecoration(
-            color: colors.surfaceContainerHigh.withValues(alpha: 0.93),
-            borderRadius: BorderRadius.circular(28),
+            color: colors.surfaceContainerHighest.withValues(alpha: 0.6),
+            borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: colors.outlineVariant.withValues(alpha: 0.35),
+              color: colors.outlineVariant.withValues(alpha: 0.25),
               width: 1,
             ),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
+                blurRadius: 20,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
@@ -88,6 +104,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     controller: _pageController,
                     onPageChanged: (index) {
                       setState(() => _currentPage = index);
+                      if (index == _totalSteps - 1) {
+                        _checkLocationPermission();
+                      }
                     },
                     children: [
                       _buildWelcomePage(),
@@ -109,47 +128,34 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         duration: const Duration(milliseconds: 200),
                         child: IgnorePointer(
                           ignoring: _currentPage == 0,
-                          child: TextButton.icon(
+                          child: FloatingActionButton.extended(
+                            heroTag: 'back',
                             onPressed: () {
                               _pageController.previousPage(
                                 duration: const Duration(milliseconds: 400),
                                 curve: Curves.easeInOutCubic,
                               );
                             },
-                            style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                            ),
                             icon: const Icon(Icons.arrow_back_rounded),
                             label: const Text('Zurück'),
+                            backgroundColor: colors.surfaceContainerHigh,
+                            foregroundColor: colors.onSurface,
                           ),
                         ),
                       ),
 
-                      FilledButton.icon(
-                        style: FilledButton.styleFrom(
-                          backgroundColor: widget.settingsService.accentColor,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 14,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18),
-                          ),
-                        ),
-                        onPressed: () {
-                          if (_currentPage < _totalSteps - 1) {
-                            _pageController.nextPage(
-                              duration: const Duration(milliseconds: 400),
-                              curve: Curves.easeInOutCubic,
-                            );
-                          } else {
-                            widget.settingsService.completeOnboarding();
-                          }
-                        },
+                      FloatingActionButton.extended(
+                        heroTag: 'next',
+                        onPressed: _currentPage < _totalSteps - 1
+                            ? () {
+                                _pageController.nextPage(
+                                  duration: const Duration(milliseconds: 400),
+                                  curve: Curves.easeInOutCubic,
+                                );
+                              }
+                            : _locationPermissionGranted
+                                ? () => widget.settingsService.completeOnboarding()
+                                : null,
                         icon: Icon(
                           _currentPage == _totalSteps - 1
                               ? Icons.check
@@ -160,6 +166,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               ? 'Starten'
                               : 'Weiter',
                         ),
+                        backgroundColor: _currentPage == _totalSteps - 1 && !_locationPermissionGranted
+                            ? colors.surfaceContainerHigh
+                            : widget.settingsService.accentColor,
+                        foregroundColor: _currentPage == _totalSteps - 1 && !_locationPermissionGranted
+                            ? colors.onSurface.withValues(alpha: 0.4)
+                            : Colors.white,
                       ),
                     ],
                   ),
@@ -237,34 +249,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ),
         const SizedBox(height: 24),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
             color: theme.colorScheme.surfaceContainerHigh,
             borderRadius: BorderRadius.circular(16),
           ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    service.themeMode == ThemeMode.dark
-                        ? Icons.dark_mode
-                        : Icons.light_mode,
-                  ),
-                  const SizedBox(width: 12),
-                  const Text(
-                    'Dunkles Design',
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
-                ],
-              ),
-              Switch(
-                value: service.themeMode == ThemeMode.dark,
-                activeThumbColor: service.accentColor,
-                onChanged: (isDark) => service.updateThemeMode(isDark),
-              ),
-            ],
+          child: SwitchListTile(
+            secondary: Icon(
+              service.themeMode == ThemeMode.dark
+                  ? Icons.dark_mode
+                  : Icons.light_mode,
+            ),
+            title: const Text('Dunkles Design'),
+            value: service.themeMode == ThemeMode.dark,
+            activeThumbColor: service.accentColor,
+            onChanged: (isDark) => service.updateThemeMode(isDark),
           ),
         ),
       ],
@@ -299,23 +297,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         ),
         const SizedBox(height: 24),
         Wrap(
-          spacing: 12,
-          runSpacing: 12,
+          spacing: 14,
+          runSpacing: 14,
           alignment: WrapAlignment.center,
           children: colors.map((color) {
             final isSelected = service.accentColor == color;
-            return FilterChip(
-              label: Container(
-                width: 20,
-                height: 20,
-                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-              ),
-              selected: isSelected,
-              checkmarkColor: Colors.white,
-              onSelected: (_) => service.updateAccentColor(color),
-              selectedColor: color.withValues(alpha: 0.3),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
+            return GestureDetector(
+              onTap: () => service.updateAccentColor(color),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle,
+                  border: isSelected
+                      ? Border.all(color: Colors.white, width: 3)
+                      : null,
+                  boxShadow: isSelected
+                      ? [BoxShadow(color: color.withValues(alpha: 0.5), blurRadius: 8, offset: const Offset(0, 2))]
+                      : [BoxShadow(color: Colors.black.withValues(alpha: 0.15), blurRadius: 4, offset: const Offset(0, 1))],
+                ),
+                child: isSelected
+                    ? const Icon(Icons.check, color: Colors.white, size: 22)
+                    : null,
               ),
             );
           }).toList(),
@@ -379,21 +384,41 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 24),
-        ElevatedButton.icon(
-          onPressed: () {
-            Geolocator.requestPermission();
-          },
-          icon: const Icon(Icons.location_on),
-          label: const Text('Standortzugriff erlauben'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: widget.settingsService.accentColor,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(18),
+        SizedBox(
+          width: double.infinity,
+          child: FloatingActionButton.extended(
+            heroTag: 'location',
+            onPressed: () async {
+              final permission = await Geolocator.requestPermission();
+              if (mounted) {
+                setState(() {
+                  _locationPermissionGranted = permission == LocationPermission.whileInUse || permission == LocationPermission.always;
+                });
+              }
+            },
+            icon: Icon(
+              _locationPermissionGranted ? Icons.check_circle : Icons.location_on,
             ),
+            label: Text(
+              _locationPermissionGranted ? 'Standortzugriff erteilt' : 'Standortzugriff erlauben',
+            ),
+            backgroundColor: _locationPermissionGranted
+                ? Colors.green
+                : widget.settingsService.accentColor,
+            foregroundColor: Colors.white,
           ),
         ),
+        if (!_locationPermissionGranted)
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: Text(
+              'Du musst den Standortzugriff erlauben, um fortzufahren.',
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.error,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
       ],
     );
   }

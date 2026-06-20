@@ -7,16 +7,27 @@ import 'package:system_theme/system_theme.dart';
 SharedPreferences? prefs;
 
 class SettingsService extends ChangeNotifier {
+  static SettingsService? _instance;
+
+  factory SettingsService() {
+    _instance ??= SettingsService._();
+    return _instance!;
+  }
+
+  SettingsService._();
+
   Color systemAccentColor = SystemTheme.kDefaultFallbackColor;
-  ThemeMode systemthemeMode = ThemeMode.light;
+  ThemeMode systemthemeMode = PlatformDispatcher.instance.platformBrightness == Brightness.dark ? ThemeMode.dark : ThemeMode.light;
   double lastTemperature = 0.0;
   String lastDescription = '';
-  String units = 'metric'; // 'metric' oder 'imperial'
+  String units = 'metric';
   bool onboardingDone = false;
-  String language = 'de'; // 'de' oder 'en'
-  ThemeMode themeMode = ThemeMode.light; // ThemeMode.light oder ThemeMode.dark
-  Color accentColor = Colors.green; // Standard-Akzentfarbe
-  double bgblur = 10.0; // Standard-Hintergrundunschärfe
+  String language = 'de';
+  ThemeMode themeMode = ThemeMode.light;
+  Color accentColor = SystemTheme.kDefaultFallbackColor;
+  double bgblur = 10.0;
+  double gradientHeight = 200;
+  bool pitchBlack = false;
 
   Future<void> initSettings() async {
     prefs = await SharedPreferences.getInstance();
@@ -33,8 +44,10 @@ class SettingsService extends ChangeNotifier {
     }
     accentColor = Color(prefs?.getInt('accentColor') ?? await _loadSystemAccentColor());
     bgblur = prefs?.getDouble('bgblur') ?? 10.0;
+    gradientHeight = prefs?.getDouble('gradientHeight') ?? 200;
     units = prefs?.getString('units') ?? 'metric';
     lastTemperature = prefs?.getDouble('lastTemperature') ?? 161.0;
+    pitchBlack = prefs?.getBool('pitchBlack') ?? false;
     notifyListeners();
   }
 
@@ -49,11 +62,10 @@ class SettingsService extends ChangeNotifier {
     }
   }
 
-  // Funktionen, um die Werte zu ändern und die UI zu aktualisieren
   void updateUnits(String newUnits) {
     units = newUnits;
     prefs?.setString('units', newUnits);
-    notifyListeners(); // Benachrichtigt die App über die Änderung
+    notifyListeners();
   }
 
   void updateLanguage(String newLanguage) {
@@ -72,6 +84,12 @@ class SettingsService extends ChangeNotifier {
       brightness: isDark ? Brightness.dark : Brightness.light,
       seedColor: accentColor,
     );
+    notifyListeners();
+  }
+
+  void updatePitchBlack(bool value) {
+    pitchBlack = value;
+    prefs?.setBool('pitchBlack', value);
     notifyListeners();
   }
 
@@ -96,6 +114,12 @@ class SettingsService extends ChangeNotifier {
     notifyListeners();
   }
 
+  void updateGradientHeight(double height) {
+    gradientHeight = height;
+    prefs?.setDouble('gradientHeight', height);
+    notifyListeners();
+  }
+
   void completeOnboarding() {
     onboardingDone = true;
     prefs?.setBool('onboardingDone', true);
@@ -109,5 +133,18 @@ class SettingsService extends ChangeNotifier {
 
   void updateLastDescription(String desc) {
     lastDescription = desc;
+  }
+
+  void resetapp() {
+    prefs?.clear();
+    themeMode = systemthemeMode;
+    accentColor = systemAccentColor;
+    bgblur = 10.0;
+    gradientHeight = 200;
+    pitchBlack = false;
+    units = 'metric';
+    language = 'de';
+    onboardingDone = false;
+    notifyListeners();
   }
 }

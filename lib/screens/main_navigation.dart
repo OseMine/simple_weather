@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:soft_edge_blur/soft_edge_blur.dart';
 import 'home_screen.dart';
 import 'forecast_screen.dart';
 import 'settings.dart' as settings_screen;
+import '../services/settings.dart';
+import '../services/getweather.dart';
+import '../widgets/weather_background.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -17,12 +21,21 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   // Index-Tracking für deine Custom-Navbar
   int _selectedIndex = 0;
+  Weather? _weather;
 
   @override
   void initState() {
     super.initState();
     _verticalController = PageController(initialPage: 0);
     _horizontalController = PageController(initialPage: 0);
+    _loadWeather();
+  }
+
+  Future<void> _loadWeather() async {
+    try {
+      final weather = await getWeather();
+      if (mounted) setState(() => _weather = weather);
+    } catch (_) {}
   }
 
   @override
@@ -88,48 +101,63 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context);
-    
-    return Scaffold(
-      extendBody: true,
-      resizeToAvoidBottomInset: false,
-      body: Stack(
-        children: [
-          MediaQuery(
-            data: mq.copyWith(
-              padding: mq.padding.copyWith(bottom: mq.padding.bottom + 104),
+
+    final contentStack = Stack(
+      children: [
+        SoftEdgeBlur(
+          edges: [
+            EdgeBlur(
+              type: EdgeType.bottomEdge,
+              size: SettingsService().gradientHeight,
+              sigma: 16,
+              controlPoints: [
+                ControlPoint(position: 0.0, type: ControlPointType.visible),
+                ControlPoint(position: 0.4, type: ControlPointType.visible),
+                ControlPoint(position: 0.8, type: ControlPointType.transparent),
+                ControlPoint(position: 1.0, type: ControlPointType.transparent),
+              ],
+              tintColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.85),
             ),
-            // ÄUẞERE PAGEVIEW: Horizontal (Wetter-Welt <-> Settings)
+          ],
+          child: MediaQuery(
+            data: mq.copyWith(
+              padding: mq.padding.copyWith(bottom: 0),
+            ),
             child: PageView(
               controller: _horizontalController,
               scrollDirection: Axis.horizontal,
               onPageChanged: (_) => _handlePageChange(),
               children: [
-                // INDEX 0: Die Wetter-Welt (Innere PageView)
                 PageView(
                   controller: _verticalController,
-                  scrollDirection: Axis.vertical, // Vertikales Wischen!
+                  scrollDirection: Axis.vertical,
                   onPageChanged: (_) => _handlePageChange(),
                   children: const [
-                    HomeScreen(),     // Index 0 (Vertikal)
-                    ForecastScreen(), // Index 1 (Vertikal)
+                    HomeScreen(),
+                    ForecastScreen(),
                   ],
                 ),
-                
-                // INDEX 1: Settings
                 const settings_screen.SettingsPage(),
               ],
             ),
           ),
-          
-          // Deine Custom-Floating-Navbar bleibt unberührt im Stack darüber liegen
-          Positioned(
-            left: 16,
-            right: 16,
-            bottom: mq.padding.bottom + 16,
-            child: _buildFloatingNavBar(context),
-          ),
-        ],
-      ),
+        ),
+
+        Positioned(
+          left: 16,
+          right: 16,
+          bottom: mq.padding.bottom + 16,
+          child: _buildFloatingNavBar(context),
+        ),
+      ],
+    );
+    
+    return Scaffold(
+      extendBody: true,
+      resizeToAvoidBottomInset: false,
+      body: _weather != null
+          ? WeatherBackground(weather: _weather!, child: contentStack)
+          : contentStack,
     );
   }
 

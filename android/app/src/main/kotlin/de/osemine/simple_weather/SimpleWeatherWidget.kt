@@ -20,9 +20,9 @@ class SimpleWeatherWidget : HomeWidgetProvider() {
                 setTextViewText(R.id.widget_temperature, temperature)
                 setTextViewText(R.id.widget_description, description)
 
-                val bgColor = widgetData.getInt("bgColor", -1)
-                val textColor = widgetData.getInt("textColor", -1)
-                val subtextColor = widgetData.getInt("subtextColor", -1)
+                val bgColor = widgetData.getLong("bgColor", -1L).toInt()
+                val textColor = widgetData.getLong("textColor", -1L).toInt()
+                val subtextColor = widgetData.getLong("subtextColor", -1L).toInt()
 
                 if (bgColor != -1) {
                     setInt(R.id.widget_root, "setBackgroundColor", bgColor)

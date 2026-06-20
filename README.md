@@ -1,18 +1,58 @@
 # Simple Weather
 
-A Flutter weather app that uses GPS location and OpenWeatherMap to display the current temperature with animated entrance effects.
+<p align="center">
+  <img src="https://img.shields.io/github/stars/OseMine/simple_weather?style=for-the-badge&logo=github&color=3182ce" alt="GitHub stars">
+  <img src="https://img.shields.io/github/forks/OseMine/simple_weather?style=for-the-badge&logo=github&color=3182ce" alt="GitHub forks">
+  <img src="https://img.shields.io/github/issues/OseMine/simple_weather?style=for-the-badge&logo=github&color=e53e3e" alt="GitHub issues">
+  <img src="https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white" alt="Flutter">
+</p>
+
+<p align="center">
+  <img src="web/screenshots/desktop.png" width="700" alt="Simple Weather Screenshot">
+</p>
+
+A minimalistic Flutter weather app that uses GPS location and OpenWeatherMap to display the current weather with a clean, animated interface.
+
+## Overview
+
+| | |
+|---|---|
+| **Platforms** | Android, iOS, macOS, Windows, Linux, Web |
+| **Weather data** | [OpenWeatherMap](https://openweathermap.org/api) (free tier) |
+| **Location** | GPS via `geolocator` |
+| **State** | `ChangeNotifier` + `shared_preferences` |
+| **Navigation** | Dual-axis `PageView` (vertical swipe + horizontal settings) |
+| **Widgets** | Android home screen widget via `home_widget` |
+| **Deployment** | GitHub Actions → APK, Web (Vercel) |
+
+## Screenshots
+
+<p align="center">
+  <img src="web/screenshots/desktop.png" width="400" alt="Desktop">
+  <img src="assets/icons/screenshots/Weather%20Page.png" width="200" alt="Weather Page">
+  <img src="assets/icons/screenshots/Details%20page.png" width="200" alt="Details Page">
+</p>
 
 ## Features
 
-- GPS-based location detection via `geolocator`
-- Current temperature and weather description from OpenWeatherMap
-- Animated temperature display: count-up, slide-up, blur, and fade-in
-- Weather-condition background icon watermark
-- Metric/imperial unit support
-- Onboarding screen (theme, accent color, units, language)
-- Settings screen with persistent preferences
-- Home screen widget (Android/iOS)
-- Cross-platform: Android, (iOS, macOS), Windows, Linux, Web
+- **GPS-based location** – uses `geolocator` with high accuracy for local weather
+- **Current weather display** – temperature, description, and weather icon from OpenWeatherMap
+- **Animated temperature** – count-up, slide-up, blur, and fade-in via `flutter_animate`
+- **Shared weather background** – blurred weather icon watermark stays fixed behind all pages
+- **Dual-axis navigation** – vertical swipe between Home and Forecast, horizontal to Settings
+- **Forecast details** – temperature, condition, cloudiness, and wind speed
+- **Metric / Imperial** – toggle between °C/m/s and °F/mph
+- **Multi-language** – German and English with in-app switching
+- **Accent color picker** – 7 preset colors + auto-detected system accent color
+- **System accent color** – automatically picks up the device's default accent color
+- **Dark mode** – manual or device-following theme
+- **Pitch black mode** – true black for AMOLED displays
+- **Custom gradient height & blur** – adjustable frosted-glass navigation bar
+- **Onboarding flow** – 5-step first-launch wizard (requires location permission to proceed)
+- **Home screen widget** – Android widget that updates with current weather
+- **Persistent preferences** – all settings survive app restarts via `shared_preferences`
+- **App reset** – restore all settings to device defaults (system theme + system accent)
+- **Cross-platform** – Android, iOS, macOS, Windows, Linux, Web
 
 ## Tech Stack
 
@@ -23,28 +63,36 @@ A Flutter weather app that uses GPS location and OpenWeatherMap to display the c
 | Geolocation | `geolocator`                      |
 | Animations  | `flutter_animate`                 |
 | Typography  | `google_fonts` (Roboto Flex)      |
+| UI          | `soft_edge_blur`, `system_theme`  |
 | API         | OpenWeatherMap (free tier)        |
 | Widgets     | `home_widget`                     |
 | Persistence | `shared_preferences`              |
+| Icons       | `country_flags`                   |
 
 ## Project Structure
 
 ```
 lib/
-├── main.dart                          # App entry point
+├── main.dart                          # App entry point, routing
 ├── screens/
-│   ├── home_screen.dart               # Main weather screen
-│   ├── onboarding.dart                # First-launch setup
-│   └── settings.dart                  # Preferences (units, theme, etc.)
+│   ├── onboarding.dart                # 5-step first-launch wizard
+│   ├── main_navigation.dart           # Dual-axis PageView + custom nav bar
+│   ├── home_screen.dart               # Main weather display
+│   ├── forecast_screen.dart           # Weather details (temp, wind, clouds)
+│   ├── settings.dart                  # Settings page
+│   └── settings/widgets/
+│       ├── accent.dart                # Accent color picker bottom sheet
+│       └── language.dart              # Language selector bottom sheet
 ├── services/
-│   ├── getweather.dart                # Weather model + API fetch
-│   ├── settings.dart                  # App settings (units, etc.)
+│   ├── getweather.dart                # Weather model + OpenWeatherMap fetch
+│   ├── settings.dart                  # SettingsService (ChangeNotifier + prefs)
 │   ├── api_key.dart                   # API key (gitignored)
 │   ├── api_key_example.dart           # API key template
 │   └── widget_service.dart            # Home widget update logic
 └── widgets/
-    ├── weather_background.dart        # Weather icon background layer
-    └── temperature_display.dart       # Animated temperature counter
+    ├── weather_background.dart        # Fixed blurred weather icon layer
+    ├── temperature_display.dart       # Animated temperature counter
+    └── slider_list_tile.dart          # Reusable slider tile widget
 
 android/                               # Android platform files
 ios/                                   # iOS platform files
@@ -53,7 +101,7 @@ macos-icons/                           # macOS app icon PNGs + .icns source
 windows/                               # Windows platform files
 linux/                                 # Linux platform files
 web/                                   # Web platform files
-assets/icons/                          # Adaptive icon SVGs
+assets/icons/                          # Adaptive icon SVGs + screenshots
 ```
 
 ## Installation & Setup
@@ -153,9 +201,9 @@ Launcher icons are configured in `pubspec.yaml` under `flutter_launcher_icons`:
 
 ## TODOs
 
-- [ ] Add hourly / daily forecast
+- [ ] Add hourly / daily extended forecast
 - [ ] Add iOS build to CI
-- [ ] Add localization support (en/de already in settings service)
+- [ ] Add more localizations (en/de already implemented)
 
 ## Contributing
 
