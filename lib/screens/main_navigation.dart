@@ -11,21 +11,84 @@ class MainNavigationScreen extends StatefulWidget {
 }
 
 class _MainNavigationScreenState extends State<MainNavigationScreen> {
+  // Zwei Controller für die zwei Achsen
+  late final PageController _verticalController;
+  late final PageController _horizontalController;
+
+  // Index-Tracking für deine Custom-Navbar
   int _selectedIndex = 0;
 
-  List<Widget> get _pages => const [
-    HomeScreen(),
-    ForecastScreen(),
-    settings_screen.SettingsPage(),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _verticalController = PageController(initialPage: 0);
+    _horizontalController = PageController(initialPage: 0);
+  }
 
-  void _onNavTap(int index) {
-    setState(() => _selectedIndex = index);
+  @override
+  void dispose() {
+    _verticalController.dispose();
+    _horizontalController.dispose();
+    super.dispose();
+  }
+
+  /// Logik für das Tippen auf die Navbar-Buttons
+  void _onNavTap(int targetIndex) {
+    if (targetIndex == _selectedIndex) return;
+
+    setState(() => _selectedIndex = targetIndex);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (targetIndex == 2) {
+        if (!_horizontalController.hasClients) return;
+        _horizontalController.animateToPage(
+          1,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.fastOutSlowIn,
+        );
+      } else {
+        if (_horizontalController.hasClients &&
+            _horizontalController.page?.round() == 1) {
+          _horizontalController.animateToPage(
+            0,
+            duration: const Duration(milliseconds: 400),
+            curve: Curves.fastOutSlowIn,
+          );
+        }
+
+        if (!_verticalController.hasClients) return;
+        _verticalController.animateToPage(
+          targetIndex,
+          duration: const Duration(milliseconds: 400),
+          curve: Curves.fastOutSlowIn,
+        );
+      }
+    });
+  }
+
+  /// Synchronisiert den Navbar-Status, wenn der User per Geste swipt
+  void _handlePageChange() {
+    int newIndex = 0;
+    
+    // Wenn die äußere PageView auf Index 1 steht, sind wir in den Settings
+    if (_horizontalController.hasClients && _horizontalController.page?.round() == 1) {
+      newIndex = 2;
+    } else if (_verticalController.hasClients) {
+      // Ansonsten bestimmt die innere vertikale PageView, ob Home (0) oder Forecast (1) aktiv ist
+      newIndex = _verticalController.page?.round() ?? 0;
+    }
+
+    if (_selectedIndex != newIndex) {
+      setState(() {
+        _selectedIndex = newIndex;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context);
+    
     return Scaffold(
       extendBody: true,
       resizeToAvoidBottomInset: false,
@@ -35,11 +98,30 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             data: mq.copyWith(
               padding: mq.padding.copyWith(bottom: mq.padding.bottom + 104),
             ),
-            child: IndexedStack(
-              index: _selectedIndex,
-              children: _pages,
+            // ÄUẞERE PAGEVIEW: Horizontal (Wetter-Welt <-> Settings)
+            child: PageView(
+              controller: _horizontalController,
+              scrollDirection: Axis.horizontal,
+              onPageChanged: (_) => _handlePageChange(),
+              children: [
+                // INDEX 0: Die Wetter-Welt (Innere PageView)
+                PageView(
+                  controller: _verticalController,
+                  scrollDirection: Axis.vertical, // Vertikales Wischen!
+                  onPageChanged: (_) => _handlePageChange(),
+                  children: const [
+                    HomeScreen(),     // Index 0 (Vertikal)
+                    ForecastScreen(), // Index 1 (Vertikal)
+                  ],
+                ),
+                
+                // INDEX 1: Settings
+                const settings_screen.SettingsPage(),
+              ],
             ),
           ),
+          
+          // Deine Custom-Floating-Navbar bleibt unberührt im Stack darüber liegen
           Positioned(
             left: 16,
             right: 16,
@@ -53,7 +135,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
   Widget _buildFloatingNavBar(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
-    final homeSelected = _selectedIndex == 0;
+    final settingsSelected = _selectedIndex == 2;
 
     return Center(
       child: Padding(
@@ -101,11 +183,11 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                     const SizedBox(width: 6),
                     _navIconBtn(
                       cs: cs,
-                      icon: Icons.settings_outlined,
-                      selectedIcon: Icons.settings_rounded,
-                      label: 'Einstellungen',
-                      selected: _selectedIndex == 2,
-                      onTap: () => _onNavTap(2),
+                      icon: Icons.wb_sunny_outlined,
+                      selectedIcon: Icons.wb_sunny_rounded,
+                      label: 'Wetter',
+                      selected: _selectedIndex == 0,
+                      onTap: () => _onNavTap(0),
                     ),
                   ],
                 ),
@@ -113,32 +195,32 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
             ),
             const SizedBox(width: 12),
             _BouncyButton(
-              onTap: () => _onNavTap(0),
+              onTap: () => _onNavTap(2),
               scaleTarget: 0.88,
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 480),
                 curve: Curves.fastOutSlowIn,
-                height: homeSelected ? 68 : 56,
-                width: homeSelected ? 68 : 56,
+                height: settingsSelected ? 68 : 56,
+                width: settingsSelected ? 68 : 56,
                 decoration: BoxDecoration(
-                  color: homeSelected
+                  color: settingsSelected
                       ? cs.primary
                       : cs.surfaceContainerHigh.withValues(alpha: 0.95),
                   borderRadius: BorderRadius.circular(
-                    homeSelected ? 22 : 18,
+                    settingsSelected ? 22 : 18,
                   ),
                   border: Border.all(
-                    color: homeSelected
+                    color: settingsSelected
                         ? cs.primary.withValues(alpha: 0.38)
                         : cs.outlineVariant.withValues(alpha: 0.30),
                     width: 0.8,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: (homeSelected ? cs.primary : cs.surfaceContainerHigh)
+                      color: (settingsSelected ? cs.primary : cs.surfaceContainerHigh)
                           .withValues(alpha: 0.32),
-                      blurRadius: homeSelected ? 20 : 12,
-                      offset: Offset(0, homeSelected ? 6 : 4),
+                      blurRadius: settingsSelected ? 20 : 12,
+                      offset: Offset(0, settingsSelected ? 6 : 4),
                     ),
                   ],
                 ),
@@ -167,14 +249,14 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       );
                     },
                     child: Icon(
-                      homeSelected
-                          ? Icons.wb_sunny_rounded
-                          : Icons.wb_sunny_outlined,
-                      key: ValueKey('weather_$homeSelected'),
-                      color: homeSelected
+                      settingsSelected
+                          ? Icons.settings_rounded
+                          : Icons.settings_outlined,
+                      key: ValueKey('settings_$settingsSelected'),
+                      color: settingsSelected
                           ? cs.onPrimary
                           : cs.onSurfaceVariant,
-                      size: homeSelected ? 34 : 28,
+                      size: settingsSelected ? 32 : 28,
                     ),
                   ),
                 ),
@@ -238,7 +320,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
                       padding: const EdgeInsets.only(left: 5),
                       child: Text(
                         label,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 13.5,
                         ),
@@ -284,10 +366,10 @@ class _BouncyButtonState extends State<_BouncyButton>
     );
     _scaleAnimation = Tween<double>(begin: 1.0, end: widget.scaleTarget)
         .animate(CurvedAnimation(
-          parent: _controller,
-          curve: Curves.easeInOutCubic,
-          reverseCurve: Curves.fastOutSlowIn,
-        ));
+      parent: _controller,
+      curve: Curves.easeInOutCubic,
+      reverseCurve: Curves.fastOutSlowIn,
+    ));
   }
 
   @override

@@ -63,5 +63,6 @@ Future<Weather> getWeather() async {
 
   final weather = Weather.fromJson(jsonDecode(response.body));
 
+
   return weather;
 }

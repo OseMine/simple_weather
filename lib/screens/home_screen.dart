@@ -24,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
       body: FutureBuilder<Weather>(
         future: _weatherFuture,
         builder: (context, snapshot) {
@@ -68,6 +69,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             ),
+            onRefresh: () async {
+              setState(() {
+                _weatherFuture = getWeather();
+              });
+              await _weatherFuture;
+            },
           );
         },
       ),

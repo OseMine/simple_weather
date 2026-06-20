@@ -6,11 +6,13 @@ import '../services/settings.dart' as settings;
 class WeatherBackground extends StatelessWidget {
   final Weather weather;
   final Widget child;
+  final Future<void> Function()? onRefresh;
 
   const WeatherBackground({
     super.key,
     required this.weather,
     required this.child,
+    this.onRefresh,
   });
 
   @override
@@ -18,9 +20,8 @@ class WeatherBackground extends StatelessWidget {
     final iconUrl = 'https://openweathermap.org/img/wn/${weather.icon}@4x.png';
     final blurValue = settings.SettingsService().bgblur;
 
-    return Stack(
+    final body = Stack(
       children: [
-        // 1. Background Layer: Positioned and Blur applied ONLY here
         Positioned(
           bottom: -60,
           right: -60,
@@ -41,10 +42,23 @@ class WeatherBackground extends StatelessWidget {
             ),
           ),
         ),
-        
-        // 2. Foreground Layer: Placed on top of the background, completely unblurred
         child,
       ],
     );
+
+    if (onRefresh != null) {
+      return RefreshIndicator(
+        onRefresh: onRefresh!,
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height,
+            child: body,
+          ),
+        ),
+      );
+    }
+
+    return body;
   }
 }

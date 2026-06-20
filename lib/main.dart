@@ -20,6 +20,7 @@ class WeatherApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
+      
       listenable: settingsService,
       builder: (context, child) {
         return MaterialApp(
