@@ -1,7 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
-
 class WidgetService {
   static Future<void> init() async {
     if (!kIsWeb) {
@@ -18,7 +17,7 @@ class WidgetService {
     required double temperature,
     required String description,
     required String units,
-    Brightness brightness = Brightness.light,
+    Brightness brightness = Brightness.dark,
     Color? seedColor,
   }) async {
     if (kIsWeb) return;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../services/settings.dart';
+import 'package:geolocator/geolocator.dart';
 
 class OnboardingScreen extends StatefulWidget {
   final SettingsService settingsService;
@@ -14,7 +15,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  static const _totalSteps = 4;
+  static const _totalSteps = 5;
 
   @override
   void dispose() {
@@ -74,7 +75,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   child: LinearProgressIndicator(
                     value: (_currentPage + 1) / _totalSteps,
                     borderRadius: BorderRadius.circular(999),
-                    backgroundColor: colors.surfaceContainerHighest.withValues(alpha: 0.4),
+                    backgroundColor: colors.surfaceContainerHighest.withValues(
+                      alpha: 0.4,
+                    ),
                     color: widget.settingsService.accentColor,
                     minHeight: 6,
                   ),
@@ -91,6 +94,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       _buildThemeAndLanguagePage(theme),
                       _buildAccentColorPage(theme),
                       _buildUnitsPage(theme),
+                      _buildLocationServicesPage(theme),
                     ],
                   ),
                 ),
@@ -113,7 +117,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               );
                             },
                             style: TextButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 12,
+                              ),
                             ),
                             icon: const Icon(Icons.arrow_back_rounded),
                             label: const Text('Zurück'),
@@ -125,8 +132,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         style: FilledButton.styleFrom(
                           backgroundColor: widget.settingsService.accentColor,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 14,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18),
+                          ),
                         ),
                         onPressed: () {
                           if (_currentPage < _totalSteps - 1) {
@@ -138,8 +150,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             widget.settingsService.completeOnboarding();
                           }
                         },
-                        icon: Icon(_currentPage == _totalSteps - 1 ? Icons.check : Icons.arrow_forward_rounded),
-                        label: Text(_currentPage == _totalSteps - 1 ? 'Starten' : 'Weiter'),
+                        icon: Icon(
+                          _currentPage == _totalSteps - 1
+                              ? Icons.check
+                              : Icons.arrow_forward_rounded,
+                        ),
+                        label: Text(
+                          _currentPage == _totalSteps - 1
+                              ? 'Starten'
+                              : 'Weiter',
+                        ),
                       ),
                     ],
                   ),
@@ -156,17 +176,25 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final theme = Theme.of(context);
     return _buildCard(
       children: [
-        Icon(Icons.wb_sunny_rounded, size: 72, color: widget.settingsService.accentColor),
+        Icon(
+          Icons.wb_sunny_rounded,
+          size: 72,
+          color: widget.settingsService.accentColor,
+        ),
         const SizedBox(height: 24),
         Text(
           'Simple Weather',
-          style: theme.textTheme.headlineLarge?.copyWith(fontWeight: FontWeight.bold),
+          style: theme.textTheme.headlineLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 12),
         Text(
           'Dein minimalistischer Wetterbegleiter. Lass uns die App kurz an dich anpassen.',
-          style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: theme.colorScheme.onSurfaceVariant,
+          ),
           textAlign: TextAlign.center,
         ),
       ],
@@ -177,14 +205,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final service = widget.settingsService;
     return _buildCard(
       children: [
-        Text('Erscheinungsbild', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+        Text(
+          'Erscheinungsbild',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 24),
-        const Align(alignment: Alignment.centerLeft, child: Text('Sprache', style: TextStyle(fontWeight: FontWeight.bold))),
+        const Align(
+          alignment: Alignment.centerLeft,
+          child: Text('Sprache', style: TextStyle(fontWeight: FontWeight.bold)),
+        ),
         const SizedBox(height: 8),
         SegmentedButton<String>(
           segments: const [
-            ButtonSegment(value: 'de', label: Text('Deutsch'), icon: Icon(Icons.language)),
-            ButtonSegment(value: 'en', label: Text('English'), icon: Icon(Icons.language)),
+            ButtonSegment(
+              value: 'de',
+              label: Text('Deutsch'),
+              icon: Icon(Icons.language),
+            ),
+            ButtonSegment(
+              value: 'en',
+              label: Text('English'),
+              icon: Icon(Icons.language),
+            ),
           ],
           selected: {service.language},
           onSelectionChanged: (newSelection) {
@@ -203,9 +247,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             children: [
               Row(
                 children: [
-                  Icon(service.themeMode == ThemeMode.dark ? Icons.dark_mode : Icons.light_mode),
+                  Icon(
+                    service.themeMode == ThemeMode.dark
+                        ? Icons.dark_mode
+                        : Icons.light_mode,
+                  ),
                   const SizedBox(width: 12),
-                  const Text('Dunkles Design', style: TextStyle(fontWeight: FontWeight.w500)),
+                  const Text(
+                    'Dunkles Design',
+                    style: TextStyle(fontWeight: FontWeight.w500),
+                  ),
                 ],
               ),
               Switch(
@@ -222,13 +273,30 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   Widget _buildAccentColorPage(ThemeData theme) {
     final service = widget.settingsService;
-    final List<Color> colors = [Colors.blue, Colors.green, Colors.orange, Colors.purple, Colors.red, Colors.teal, service.systemAccentColor];
+    final List<Color> colors = [
+      Colors.blue,
+      Colors.green,
+      Colors.orange,
+      Colors.purple,
+      Colors.red,
+      Colors.teal,
+      service.systemAccentColor,
+    ];
 
     return _buildCard(
       children: [
-        Text('Deine Akzentfarbe', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+        Text(
+          'Deine Akzentfarbe',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 12),
-        Text('Färbe Knöpfe und Details nach deinem Geschmack.', style: theme.textTheme.bodyMedium, textAlign: TextAlign.center),
+        Text(
+          'Färbe Knöpfe und Details nach deinem Geschmack.',
+          style: theme.textTheme.bodyMedium,
+          textAlign: TextAlign.center,
+        ),
         const SizedBox(height: 24),
         Wrap(
           spacing: 12,
@@ -237,12 +305,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           children: colors.map((color) {
             final isSelected = service.accentColor == color;
             return FilterChip(
-              label: Container(width: 20, height: 20, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+              label: Container(
+                width: 20,
+                height: 20,
+                decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+              ),
               selected: isSelected,
               checkmarkColor: Colors.white,
               onSelected: (_) => service.updateAccentColor(color),
               selectedColor: color.withValues(alpha: 0.3),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
             );
           }).toList(),
         ),
@@ -254,19 +328,71 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final service = widget.settingsService;
     return _buildCard(
       children: [
-        Text('Einheitensystem', style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold)),
+        Text(
+          'Einheitensystem',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
         const SizedBox(height: 12),
-        Text('Wie sollen Temperaturen angezeigt werden?', style: theme.textTheme.bodyMedium, textAlign: TextAlign.center),
+        Text(
+          'Wie sollen Temperaturen angezeigt werden?',
+          style: theme.textTheme.bodyMedium,
+          textAlign: TextAlign.center,
+        ),
         const SizedBox(height: 24),
         SegmentedButton<String>(
           segments: const [
-            ButtonSegment(value: 'metric', label: Text('Metrisch'), icon: Icon(Icons.thermostat)),
-            ButtonSegment(value: 'imperial', label: Text('Imperial'), icon: Icon(Icons.thunderstorm)),
+            ButtonSegment(
+              value: 'metric',
+              label: Text('Metrisch'),
+              icon: Icon(Icons.thermostat),
+            ),
+            ButtonSegment(
+              value: 'imperial',
+              label: Text('Imperial'),
+              icon: Icon(Icons.thunderstorm),
+            ),
           ],
           selected: {service.units},
           onSelectionChanged: (newSelection) {
             service.updateUnits(newSelection.first);
           },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLocationServicesPage(ThemeData theme) {
+    return _buildCard(
+      children: [
+        Text(
+          'Standortdienste',
+          style: theme.textTheme.titleLarge?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          'Um das Wetter an deinem aktuellen Standort anzuzeigen, benötigt die App Zugriff auf deine Standortdaten. Du kannst dies später in den Einstellungen ändern.',
+          style: theme.textTheme.bodyMedium,
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: 24),
+        ElevatedButton.icon(
+          onPressed: () {
+            Geolocator.requestPermission();
+          },
+          icon: const Icon(Icons.location_on),
+          label: const Text('Standortzugriff erlauben'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: widget.settingsService.accentColor,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18),
+            ),
+          ),
         ),
       ],
     );
