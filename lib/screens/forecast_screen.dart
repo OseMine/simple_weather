@@ -23,6 +23,7 @@ class _ForecastScreenState extends State<ForecastScreen> {
     final cs = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: FutureBuilder<Weather>(
         future: _weatherFuture,
         builder: (context, snapshot) {

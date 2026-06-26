@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:dynamic_color/dynamic_color.dart';
 import 'widget_service.dart';
 import 'package:system_theme/system_theme.dart';
 
@@ -22,7 +23,7 @@ class SettingsService extends ChangeNotifier {
   String lastDescription = '';
   String units = 'metric';
   bool onboardingDone = false;
-  String language = 'de';
+  String language = 'en';
   ThemeMode themeMode = ThemeMode.light;
   Color accentColor = SystemTheme.kDefaultFallbackColor;
   double bgblur = 10.0;
@@ -42,7 +43,8 @@ class SettingsService extends ChangeNotifier {
           ? ThemeMode.dark
           : ThemeMode.light;
     }
-    accentColor = Color(prefs?.getInt('accentColor') ?? await _loadSystemAccentColor());
+    await _loadSystemAccentColor();
+    accentColor = Color(prefs?.getInt('accentColor') ?? systemAccentColor.toARGB32());
     bgblur = prefs?.getDouble('bgblur') ?? 10.0;
     gradientHeight = prefs?.getDouble('gradientHeight') ?? 200;
     units = prefs?.getString('units') ?? 'metric';
@@ -51,15 +53,33 @@ class SettingsService extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<int> _loadSystemAccentColor() async {
+  Future<void> _loadSystemAccentColor() async {
+    Color? systemColor;
+
+    // 1. Android 12+ (Material You dynamic colors via CorePalette)
     try {
-      await SystemTheme.accentColor.load();
-      systemAccentColor = SystemTheme.accentColor.accent;
-      return systemAccentColor.toARGB32();
-    } catch (_) {
-      systemAccentColor = SystemTheme.kDefaultFallbackColor;
-      return systemAccentColor.toARGB32();
+      final corePalette = await DynamicColorPlugin.getCorePalette();
+      if (corePalette != null) {
+        systemColor = Color(corePalette.primary.get(40));
+      }
+    } catch (_) {}
+
+    // 2. macOS, Windows, Linux (OS accent color)
+    if (systemColor == null) {
+      try {
+        systemColor = await DynamicColorPlugin.getAccentColor();
+      } catch (_) {}
     }
+
+    // 3. iOS and fallback (via system_theme)
+    if (systemColor == null) {
+      try {
+        await SystemTheme.accentColor.load();
+        systemColor = SystemTheme.accentColor.accent;
+      } catch (_) {}
+    }
+
+    systemAccentColor = systemColor ?? SystemTheme.kDefaultFallbackColor;
   }
 
   void updateUnits(String newUnits) {
@@ -143,7 +163,7 @@ class SettingsService extends ChangeNotifier {
     gradientHeight = 200;
     pitchBlack = false;
     units = 'metric';
-    language = 'de';
+    language = 'en';
     onboardingDone = false;
     notifyListeners();
   }

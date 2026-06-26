@@ -3,7 +3,7 @@ import '../../../services/settings.dart' as settings;
 import 'package:country_flags/country_flags.dart';
 
 Widget buildLanguageSettings(BuildContext context) {
-  final currentLang = settings.prefs?.getString('language') ?? 'de';
+  final currentLang = settings.SettingsService().language;
 
   // 1. Hier definierst du alle Sprachen: 'Sprachcode': 'Anzeigename'
   final Map<String, String> languages = {

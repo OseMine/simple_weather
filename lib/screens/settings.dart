@@ -20,6 +20,7 @@ class _SettingsPageState extends State<SettingsPage> {
       builder: (context, _) {
         final s = SettingsService();
         return Scaffold(
+          backgroundColor: Colors.transparent,
           appBar: AppBar(title: const Text('Settings')),
           body: ListView(
             padding: EdgeInsets.only(
@@ -30,11 +31,11 @@ class _SettingsPageState extends State<SettingsPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
-                  vertical: 8,
+                  vertical: 2,
                 ),
                 child: SizedBox(
                   width: double.infinity,
-                  height: 56,
+                  height: 48,
                   child: FloatingActionButton.extended(
                     onPressed: () {
                       showModalBottomSheet(
@@ -98,7 +99,7 @@ class _SettingsPageState extends State<SettingsPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
-                  vertical: 4,
+                  vertical: 2,
                 ),
                 child: SizedBox(
                   width: double.infinity,
@@ -133,7 +134,7 @@ class _SettingsPageState extends State<SettingsPage> {
               Padding(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 16,
-                  vertical: 4,
+                  vertical: 2,
                 ),
                 child: SizedBox(
                   width: double.infinity,
@@ -196,29 +197,42 @@ class _SettingsPageState extends State<SettingsPage> {
                   },
                 ),
               ),
-              AboutListTile(
-                icon: const Icon(Icons.info_outline),
-                applicationName: 'Simple Weather',
-                applicationVersion: '1.1.0+1',
-                applicationIcon: const Icon(Icons.wb_sunny_rounded, size: 48),
-                applicationLegalese: '© 2026 OseMine',
-                aboutBoxChildren: [
-                  const Padding(
-                    padding: EdgeInsets.only(top: 16),
-                    child: Text(
-                      'The Most Simple Weatherapp',
-                      textAlign: TextAlign.center,
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: AboutListTile(
+                  icon: const Icon(Icons.info_outline),
+                  applicationName: 'Simple Weather',
+                  applicationVersion: '1.1.0+1',
+                  applicationIcon: const Icon(Icons.wb_sunny_rounded, size: 48),
+                  applicationLegalese: '© 2026 OseMine',
+                  aboutBoxChildren: [
+                    const Padding(
+                      padding: EdgeInsets.only(top: 16),
+                      child: Text(
+                        'The Most Simple Weatherapp',
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-              FloatingActionButton.extended(
-                heroTag: 'reset',
-                onPressed: () {
-                  s.resetapp();
-                },
-                label: const Text('Reset app'),
-                icon: const Icon(Icons.restart_alt),
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 2,
+                ),
+                child: SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: FloatingActionButton.extended(
+                    heroTag: 'reset',
+                    onPressed: () {
+                      s.resetapp();
+                    },
+                    label: const Text('Reset app'),
+                    icon: const Icon(Icons.restart_alt),
+                  ),
+                ),
               ),
             ],
           ),

@@ -23,7 +23,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      
+      backgroundColor: Colors.transparent,
       body: FutureBuilder<Weather>(
         future: _weatherFuture,
         builder: (context, snapshot) {
